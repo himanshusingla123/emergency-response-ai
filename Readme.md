@@ -41,17 +41,17 @@ Response: emergency type, criticality badge, nearest hospital, immediate actions
 
 ```
                         ┌─────────────────────────────────────┐
-                        │         Google ADK SequentialAgent   │
-                        │                                      │
+                        │         Google ADK SequentialAgent  │
+                        │                                     │
   EmergencyRequest ───► │  Detection → Severity → Location    │
                         │  → Resources → Recommendation       │
                         │  → Notification                     │
-                        │                                      │
+                        │                                     │
                         └──────────────┬──────────────────────┘
                                        │
                           ┌────────────▼────────────┐
-                          │   Criticality Engine     │
-                          │   (deterministic rules)  │
+                          │   Criticality Engine    │
+                          │   (deterministic rules) │
                           └────────────┬────────────┘
                                        │
                ┌───────────────────────┼───────────────────────┐
