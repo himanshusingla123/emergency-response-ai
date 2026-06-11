@@ -1,0 +1,27 @@
+[
+  {
+    "name": "google-rapid-hackathon",
+    "description": null,
+    "id": "UHJvamVjdDo1"
+  },
+  {
+    "name": "Customer Support Bot",
+    "description": "Traces and evaluations for our customer support chatbot",
+    "id": "UHJvamVjdDo0"
+  },
+  {
+    "name": "hackathon-pro",
+    "description": null,
+    "id": "UHJvamVjdDoz"
+  },
+  {
+    "name": "demo_llama_index",
+    "description": null,
+    "id": "UHJvamVjdDoy"
+  },
+  {
+    "name": "default",
+    "description": "Default project",
+    "id": "UHJvamVjdDox"
+  }
+]

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emergency Response AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0f;
+    --bg2: #131316;
+    --bg3: #1a1a1f;
+    --card: #18181d;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f0f2;
+    --muted: #8a8a95;
+    --hint: #555560;
+    --red: #ff4444;
+    --red-bg: rgba(255,68,68,0.1);
+    --red-border: rgba(255,68,68,0.25);
+    --amber: #f59e0b;
+    --amber-bg: rgba(245,158,11,0.1);
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,0.1);
+    --blue: #3b82f6;
+    --blue-bg: rgba(59,130,246,0.1);
+    --purple: #a855f7;
+    --purple-bg: rgba(168,85,247,0.1);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    min-height: 100vh;
+  }
+
+  /* LEFT PANEL */
+  .left {
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    background: var(--red-bg);
+    border: 1px solid var(--red-border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--red);
+    font-size: 17px;
+  }
+
+  .brand-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .brand-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  .field { margin-bottom: 14px; }
+  .field label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 5px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  textarea, input, select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 9px 11px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  textarea:focus, input:focus, select:focus { border-color: rgba(255,255,255,0.25); }
+  textarea { min-height: 80px; resize: vertical; }
+  select option { background: var(--bg3); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .run-btn {
+    width: 100%;
+    height: 42px;
+    background: var(--red);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 8px;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .run-btn:hover { opacity: 0.88; }
+  .run-btn:active { transform: scale(0.98); }
+  .run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .stack-info {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .stack-label { font-size: 10px; color: var(--hint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .stack-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .pill {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    background: var(--bg3);
+  }
+
+  /* RIGHT PANEL */
+  .right {
+    padding: 28px 32px;
+    min-height: 100vh;
+  }
+
+  .idle-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    color: var(--hint);
+  }
+  .idle-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+  .idle-state p { font-size: 14px; }
+
+  /* PIPELINE STAGES */
+  .pipeline-bar {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .stage {
+    flex: 1;
+    padding: 10px 6px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--hint);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    transition: all 0.3s;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .stage:last-child { border-right: none; }
+  .stage i { display: block; font-size: 17px; margin-bottom: 3px; }
+  .stage.active { background: var(--amber-bg); color: var(--amber); border-color: rgba(245,158,11,0.2); }
+  .stage.done { background: var(--green-bg); color: var(--green); border-color: rgba(34,197,94,0.2); }
+  .stage.err { background: var(--red-bg); color: var(--red); }
+
+  .status-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--amber);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* RESULTS */
+  .results { display: none; }
+
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .metric {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .metric-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .metric-val { font-size: 18px; font-weight: 600; color: var(--text); }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .badge-extreme { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+  .badge-high { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+  .badge-medium { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(59,130,246,0.25); }
+  .badge-low { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .card-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-title i { font-size: 14px; }
+
+  .action-list { list-style: none; }
+  .action-list li {
+    font-size: 12px;
+    color: var(--text);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    line-height: 1.5;
+  }
+  .action-list li:last-child { border-bottom: none; }
+  .action-list li .ico { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  .action-list li .ico.g { color: var(--green); }
+  .action-list li .ico.r { color: var(--red); }
+
+  .hospital-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hosp-ico {
+    width: 38px; height: 38px;
+    background: var(--blue-bg);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--blue); font-size: 19px; flex-shrink: 0;
+    border: 1px solid rgba(59,130,246,0.2);
+  }
+  .hosp-name { font-size: 13px; font-weight: 500; }
+  .hosp-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* EVAL BARS */
+  .eval-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 7px;
+  }
+  .eval-lbl { font-size: 11px; color: var(--muted); width: 140px; flex-shrink: 0; }
+  .eval-bg { flex: 1; height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .eval-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.7s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+  .eval-num { font-size: 11px; color: var(--muted); width: 32px; text-align: right; }
+
+  /* PHOENIX PULSE */
+  .phoenix-row {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11px; color: var(--muted); margin-top: 10px;
+    padding-top: 10px; border-top: 1px solid var(--border);
+  }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+  /* STATS */
+  .stat-row {
+    display: flex; align-items: center;
+    padding: 6px 0; border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row i { color: var(--hint); font-size: 15px; margin-right: 8px; }
+  .stat-key { color: var(--muted); flex: 1; }
+  .stat-val { font-weight: 500; color: var(--text); }
+  .stat-val.ok { color: var(--green); }
+  .stat-val.warn { color: var(--amber); }
+
+  /* NOTIF CHIPS */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px;
+    background: var(--green-bg); color: var(--green);
+    border: 1px solid rgba(34,197,94,0.2);
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .section-gap { margin-bottom: 12px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- LEFT: INPUT PANEL -->
+  <aside class="left">
+    <div class="brand">
+      <div class="brand-icon"><i class="ti ti-urgent"></i></div>
+      <div>
+        <div class="brand-name">Emergency Response AI</div>
+        <div class="brand-sub">Multi-agent · Arize Phoenix · Gemini 2.5</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Symptoms</label>
+      <textarea id="symptoms">severe chest pain radiating to left arm, sweating, shortness of breath</textarea>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>Age</label>
+        <input type="number" id="age" value="55" min="1" max="120">
+      </div>
+      <div class="field">
+        <label>Gender</label>
+        <select id="gender">
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Medical history</label>
+      <input type="text" id="history" value="hypertension, diabetes" placeholder="e.g. diabetes">
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>Latitude</label>
+        <input type="number" id="lat" value="19.0760" step="0.0001">
+      </div>
+      <div class="field">
+        <label>Longitude</label>
+        <input type="number" id="lng" value="72.8777" step="0.0001">
+      </div>
+    </div>
+
+    <button class="run-btn" id="runBtn" onclick="runPipeline()">
+      <i class="ti ti-player-play"></i> Run emergency pipeline
+    </button>
+
+    <div class="stack-info">
+      <div class="stack-label">Powered by</div>
+      <div class="stack-pills">
+        <span class="pill">Google ADK</span>
+        <span class="pill">Gemini 2.5 Flash</span>
+        <span class="pill">Arize Phoenix</span>
+        <span class="pill">FastAPI</span>
+        <span class="pill">Twilio</span>
+        <span class="pill">Google Places</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT: OUTPUT PANEL -->
+  <main class="right" id="rightPanel">
+
+    <div class="idle-state" id="idleState">
+      <i class="ti ti-heartbeat"></i>
+      <p>Fill in the symptoms and run the pipeline<br>to see the full multi-agent response.</p>
+    </div>
+
+    <!-- pipeline visible after clicking run -->
+    <div id="pipelineSection" style="display:none">
+
+      <div class="pipeline-bar">
+        <div class="stage" id="s0"><i class="ti ti-stethoscope"></i>Detect</div>
+        <div class="stage" id="s1"><i class="ti ti-activity"></i>Severity</div>
+        <div class="stage" id="s2"><i class="ti ti-map-pin"></i>Location</div>
+        <div class="stage" id="s3"><i class="ti ti-building-hospital"></i>Resources</div>
+        <div class="stage" id="s4"><i class="ti ti-checklist"></i>Recommend</div>
+        <div class="stage" id="s5"><i class="ti ti-send"></i>Notify</div>
+      </div>
+
+      <div class="status-line" id="statusLine">
+        <div class="spinner" id="spinner"></div>
+        <span id="statusText">Starting pipeline…</span>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="results" id="results">
+
+        <!-- top metrics -->
+        <div class="metrics-row section-gap">
+          <div class="metric">
+            <div class="metric-lbl">Emergency</div>
+            <div class="metric-val" id="rEmergency" style="font-size:14px;margin-top:4px">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-lbl">Criticality</div>
+            <div style="margin-top:6px"><span class="badge" id="rCriticality">—</span></div>
+          </div>
+          <div class="metric">
+            <div class="metric-lbl">Severity</div>
+            <div class="metric-val" id="rSeverity">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-lbl">Ambulance</div>
+            <div class="metric-val" id="rAmbulance">—</div>
+          </div>
+        </div>
+
+        <!-- hospital -->
+        <div class="card section-gap" id="hospitalCard" style="display:none">
+          <div class="card-title"><i class="ti ti-building-hospital"></i> Nearest hospital</div>
+          <div class="hospital-row">
+            <div class="hosp-ico"><i class="ti ti-building-hospital"></i></div>
+            <div>
+              <div class="hosp-name" id="hospName">—</div>
+              <div class="hosp-meta" id="hospMeta">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- actions + dos/donts -->
+        <div class="row2 section-gap">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-bolt"></i> Immediate actions</div>
+            <ul class="action-list" id="rActions"></ul>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="ti ti-list-check"></i> Do's &amp; don'ts</div>
+            <ul class="action-list" id="rDos"></ul>
+          </div>
+        </div>
+
+        <!-- eval + stats -->
+        <div class="row2 section-gap">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-chart-bar"></i> LLM-as-a-judge eval <span id="evalStatus" style="margin-left:auto;font-size:10px;color:var(--muted)">async…</span></div>
+            <div>
+              <div class="eval-row"><div class="eval-lbl">Clinical accuracy</div><div class="eval-bg"><div class="eval-fill" id="eb0"></div></div><div class="eval-num" id="es0">—</div></div>
+              <div class="eval-row"><div class="eval-lbl">Recommendation quality</div><div class="eval-bg"><div class="eval-fill" id="eb1"></div></div><div class="eval-num" id="es1">—</div></div>
+              <div class="eval-row"><div class="eval-lbl">Completeness</div><div class="eval-bg"><div class="eval-fill" id="eb2"></div></div><div class="eval-num" id="es2">—</div></div>
+              <div class="eval-row"><div class="eval-lbl">Response safety</div><div class="eval-bg"><div class="eval-fill" id="eb3"></div></div><div class="eval-num" id="es3">—</div></div>
+            </div>
+            <div class="phoenix-row">
+              <div class="pulse"></div>
+              <span>Traced in Arize Phoenix · label: <strong id="rLabel">—</strong></span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><i class="ti ti-cpu"></i> Agent pipeline stats</div>
+            <div class="stat-row"><i class="ti ti-brain"></i><span class="stat-key">Model</span><span class="stat-val">Gemini 2.5 Flash</span></div>
+            <div class="stat-row"><i class="ti ti-layers-intersect"></i><span class="stat-key">Sub-agents</span><span class="stat-val">6 sequential</span></div>
+            <div class="stat-row"><i class="ti ti-clock"></i><span class="stat-key">Duration</span><span class="stat-val" id="rDuration">—</span></div>
+            <div class="stat-row"><i class="ti ti-shield-check"></i><span class="stat-key">Confidence</span><span class="stat-val" id="rConfidence">—</span></div>
+            <div class="stat-row"><i class="ti ti-eye"></i><span class="stat-key">Phoenix tracing</span><span class="stat-val ok">active</span></div>
+            <div class="stat-row"><i class="ti ti-refresh"></i><span class="stat-key">Self-improvement</span><span class="stat-val ok">every 5 runs</span></div>
+            <div class="stat-row"><i class="ti ti-plug"></i><span class="stat-key">MCP integration</span><span class="stat-val ok">@arizeai/phoenix-mcp</span></div>
+          </div>
+        </div>
+
+        <!-- notifications -->
+        <div class="card section-gap" id="notifCard" style="display:none">
+          <div class="card-title"><i class="ti ti-bell"></i> Emergency contacts notified</div>
+          <div class="chips" id="rContacts"></div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const BASE = window.location.hostname === '127.0.0.1' 
+  ? 'http://localhost:8000' 
+  : window.location.origin;
+let startTime;
+
+const stageIds = ['s0','s1','s2','s3','s4','s5'];
+const stageLabels = [
+  'Detecting emergency type…',
+  'Scoring severity…',
+  'Resolving location…',
+  'Finding nearest hospital…',
+  'Building recommendations…',
+  'Sending notifications…'
+];
+
+function setStage(idx) {
+  stageIds.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'stage' + (i < idx ? ' done' : i === idx ? ' active' : '');
+  });
+}
+
+function allDone() {
+  stageIds.forEach(id => { document.getElementById(id).className = 'stage done'; });
+}
+
+function critClass(level) {
+  const l = (level||'').toLowerCase();
+  return l === 'extreme' ? 'badge badge-extreme'
+       : l === 'high'    ? 'badge badge-high'
+       : l === 'medium'  ? 'badge badge-medium'
+       : 'badge badge-low';
+}
+
+function li(text, good) {
+  return `<li><i class="ti ${good ? 'ti-circle-check ico g' : 'ti-circle-x ico r'}"></i>${text}</li>`;
+}
+
+async function runPipeline() {
+  const btn = document.getElementById('runBtn');
+  const symp = document.getElementById('symptoms').value.trim();
+  if (!symp) return;
+
+  btn.disabled = true;
+  startTime = Date.now();
+
+  document.getElementById('idleState').style.display = 'none';
+  document.getElementById('pipelineSection').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('spinner').style.display = 'block';
+
+  let si = 0;
+  setStage(0);
+  document.getElementById('statusText').textContent = stageLabels[0];
+
+  const stageTimer = setInterval(() => {
+    si = Math.min(si + 1, 5);
+    setStage(si);
+    document.getElementById('statusText').textContent = stageLabels[si];
+  }, 5500);
+
+  const payload = {
+    user_id: 'frontend-demo',
+    symptoms: symp,
+    age: parseInt(document.getElementById('age').value) || 30,
+    gender: document.getElementById('gender').value,
+    medical_history: document.getElementById('history').value,
+    location: {
+      latitude: parseFloat(document.getElementById('lat').value) || 19.076,
+      longitude: parseFloat(document.getElementById('lng').value) || 72.8777
+    },
+    emergency_contacts: [{ name: 'Tim', phone: '+916280894726', relationship: 'family' }]
+  };
+
+  try {
+    const res = await fetch(`${BASE}/emergency/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    clearInterval(stageTimer);
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || 'Pipeline error');
+    }
+
+    const d = await res.json();
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
+
+    allDone();
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('statusText').textContent = 'Pipeline complete · ' + elapsed;
+
+    document.getElementById('rEmergency').textContent = d.detected_emergency || '—';
+
+    const crit = document.getElementById('rCriticality');
+    crit.textContent = d.criticality || '—';
+    crit.className = critClass(d.criticality);
+
+    document.getElementById('rSeverity').textContent = d.severity || '—';
+    document.getElementById('rAmbulance').textContent = d.ambulance_required ? 'Yes' : 'No';
+    document.getElementById('rDuration').textContent = elapsed;
+    document.getElementById('rConfidence').textContent = Math.round((d.confidence || 0) * 100) + '%';
+
+    if (d.nearest_hospital) {
+      document.getElementById('hospitalCard').style.display = 'block';
+      document.getElementById('hospName').textContent = d.nearest_hospital.name || '—';
+      const dist = d.nearest_hospital.distance_km ? d.nearest_hospital.distance_km.toFixed(1) + ' km away' : '';
+      const eta = d.nearest_hospital.eta_minutes ? ' · ~' + d.nearest_hospital.eta_minutes + ' min ETA' : '';
+      document.getElementById('hospMeta').textContent = dist + eta;
+    }
+
+    document.getElementById('rActions').innerHTML =
+      (d.immediate_actions || []).slice(0, 5).map(a => li(a, true)).join('');
+
+    const dos = (d.dos || []).slice(0, 2).map(a => li(a, true)).join('');
+    const donts = (d.donts || []).slice(0, 2).map(a => li(a, false)).join('');
+    document.getElementById('rDos').innerHTML = dos + donts;
+
+    if (d.contacts_notified && d.contacts_notified.length) {
+      document.getElementById('notifCard').style.display = 'block';
+      document.getElementById('rContacts').innerHTML = d.contacts_notified
+        .map(c => `<span class="chip"><i class="ti ti-check"></i>${c}</span>`).join('');
+    }
+
+    document.getElementById('results').style.display = 'block';
+
+    const reqId = await getLatestReqId();
+    if (reqId) pollEval(reqId);
+
+  } catch (e) {
+    clearInterval(stageTimer);
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('statusText').textContent = 'Error: ' + e.message;
+    stageIds.forEach(id => {
+      if (document.getElementById(id).classList.contains('active'))
+        document.getElementById(id).className = 'stage err';
+    });
+  }
+
+  btn.disabled = false;
+}
+
+async function getLatestReqId() {
+  try {
+    const r = await fetch(`${BASE}/emergency/history?limit=1`);
+    const d = await r.json();
+    return d.requests && d.requests[0] ? d.requests[0].request_id : null;
+  } catch { return null; }
+}
+
+function pollEval(reqId, attempt = 0) {
+  if (attempt > 15) {
+    document.getElementById('evalStatus').textContent = 'timed out';
+    return;
+  }
+  setTimeout(async () => {
+    try {
+      const r = await fetch(`${BASE}/emergency/evaluation/${reqId}`);
+      if (r.status === 404) { pollEval(reqId, attempt + 1); return; }
+      const d = await r.json();
+      const keys = ['clinical_accuracy', 'recommendation_quality', 'completeness', 'response_safety'];
+      keys.forEach((k, i) => {
+        const pct = Math.round((d[k] || 0) * 100);
+        document.getElementById(`eb${i}`).style.width = pct + '%';
+        document.getElementById(`es${i}`).textContent = pct + '%';
+      });
+      document.getElementById('evalStatus').textContent = 'done';
+      document.getElementById('rLabel').textContent = d.label || '—';
+    } catch { pollEval(reqId, attempt + 1); }
+  }, 5000);
+}
+</script>
+</body>
+</html>

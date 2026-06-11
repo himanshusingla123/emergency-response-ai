@@ -1,0 +1,23 @@
+{
+  "extracted_at": "2026-06-11T09:22:08.872981+00:00",
+  "project": "google-rapid-hackathon",
+  "base_url": "https://app.phoenix.arize.com/s/him250870",
+  "counts": {
+    "projects": 5,
+    "traces": 0,
+    "spans": 0,
+    "annotations": 0,
+    "sessions": 0,
+    "prompts": 1,
+    "datasets": 1
+  },
+  "eval_scores": {
+    "count": 0,
+    "average": null,
+    "min": null,
+    "max": null,
+    "label_counts": {}
+  },
+  "emergency_types_seen": [],
+  "span_kinds": []
+}

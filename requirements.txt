@@ -1,0 +1,31 @@
+# Google ADK + GenAI SDK (vertexai generative modules deprecated June 2026 — use google-genai)
+google-adk==2.2.0
+google-cloud-aiplatform==1.155.0
+google-genai==1.75.0
+
+# Arize Phoenix Observability (full stack)
+arize-phoenix==15.4.0
+arize-phoenix-otel==0.16.1
+arize-phoenix-evals==3.1.0
+# Instruments google-genai SDK (replaces old openinference-instrumentation-vertexai)
+opentelemetry-api==1.42.1
+openinference-instrumentation-google-genai==1.0.2
+opentelemetry-sdk==1.42.1
+opentelemetry-exporter-otlp==1.42.1
+opentelemetry-proto==1.42.1
+
+# API
+fastapi==0.136.1
+uvicorn[standard]>=0.34.0
+httpx>=0.28.0
+pydantic==2.13.4
+pydantic-settings>=2.9.0
+
+# Notifications
+twilio==9.10.9
+
+# Utilities
+python-dotenv>=1.1.0
+structlog>=25.3.0
+
+aiofiles==25.1.0
